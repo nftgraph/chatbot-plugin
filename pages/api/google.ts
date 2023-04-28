@@ -1,6 +1,7 @@
 import { Message } from '@/types/chat';
 import { GoogleBody, GoogleSource } from '@/types/google';
 import { OPENAI_API_HOST } from '@/utils/app/const';
+import { OpenAIError } from '@/utils/server';
 import { cleanSourceText } from '@/utils/server/google';
 import { Readability } from '@mozilla/readability';
 import endent from 'endent';
@@ -21,6 +22,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         googleCSEId ? googleCSEId : process.env.GOOGLE_CSE_ID
       }&q=${userMessage.content.trim()}&num=5`,
     );
+
+    console.log('googleRes', googleRes);
 
     const googleData = await googleRes.json();
 
@@ -65,7 +68,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
             return {
               ...source,
               // TODO: switch to tokens
-              text: sourceText.slice(0, 2000),
+              text: sourceText.slice(0, 500),
             } as GoogleSource;
           }
           // }
@@ -108,6 +111,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
     const answerMessage: Message = { role: 'user', content: answerPrompt };
 
+    console.log('answerMessage', answerMessage);
+
     const answerRes = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
       headers: {
         'Content-Type': 'application/json',
@@ -127,16 +132,31 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
           answerMessage,
         ],
         max_tokens: 1000,
-        temperature: 1,
+        temperature: 0,
         stream: false,
       }),
     });
 
+    console.log('answerRes', answerRes);
+    if (answerRes.status !== 200) {
+      const result = await answerRes.json();
+      if (result.error) {
+        throw new OpenAIError(
+          result.error.message,
+          result.error.type,
+          result.error.param,
+          result.error.code,
+        );
+      } else {
+        throw new Error('Unknown error');
+      }
+    }
     const { choices: choices2 } = await answerRes.json();
     const answer = choices2[0].message.content;
 
     res.status(200).json({ answer });
   } catch (error) {
+    console.log('Errorです。', error);
     return new Response('Error', { status: 500 });
   }
 };

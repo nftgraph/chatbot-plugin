@@ -1,10 +1,11 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
-import { Plugin } from '@/types/plugin';
+import { Plugin,PluginName } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import {
   IconBolt,
   IconBrandGoogle,
+  IconFileText,
   IconPlayerStop,
   IconRepeat,
   IconSend,
@@ -249,6 +250,17 @@ export const ChatInput: FC<Props> = ({
     };
   }, []);
 
+  const getIconByPlugin = (plugin: Plugin) => {
+    switch (plugin.name) {
+      case PluginName.GOOGLE_SEARCH:
+        return <IconBrandGoogle size={20} />;
+      case PluginName.INCONTEXT_LEARNING:
+        return <IconFileText size={20} />;
+      default:
+        return <IconBolt size={20} />;
+    }
+  }
+
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
       <div className="stretch mx-2 mt-4 flex flex-row gap-3 last:mb-2 md:mx-4 md:mt-[52px] md:last:mb-6 lg:mx-auto lg:max-w-3xl">
@@ -276,7 +288,7 @@ export const ChatInput: FC<Props> = ({
             onClick={() => setShowPluginSelect(!showPluginSelect)}
             onKeyDown={(e) => {}}
           >
-            {plugin ? <IconBrandGoogle size={20} /> : <IconBolt size={20} />}
+            {plugin ? getIconByPlugin(plugin) : <IconBolt size={20} />}
           </button>
 
           {showPluginSelect && (

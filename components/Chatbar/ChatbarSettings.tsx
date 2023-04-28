@@ -1,6 +1,6 @@
 import { SupportedExportFormats } from '@/types/export';
 import { PluginKey } from '@/types/plugin';
-import { IconFileExport, IconMoon, IconSun } from '@tabler/icons-react';
+import { IconFileExport, IconFileUpload, IconMoon, IconSun } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC } from 'react';
 import { Import } from '../Settings/Import';
@@ -8,6 +8,7 @@ import { Key } from '../Settings/Key';
 import { SidebarButton } from '../Sidebar/SidebarButton';
 import { ClearConversations } from './ClearConversations';
 import { PluginKeys } from './PluginKeys';
+import { UploadPdf } from './UploadPdf';
 
 interface Props {
   lightMode: 'light' | 'dark';
@@ -56,6 +57,13 @@ export const ChatbarSettings: FC<Props> = ({
         onClick={() => onExportConversations()}
       />
 
+      <UploadPdf
+        pluginKeys={pluginKeys}
+        apiKey={apiKey}
+        //onPluginKeyChange={onPluginKeyChange}
+        //onClearPluginKey={onClearPluginKey}
+      />
+
       <SidebarButton
         text={lightMode === 'light' ? t('Dark mode') : t('Light mode')}
         icon={
@@ -66,11 +74,11 @@ export const ChatbarSettings: FC<Props> = ({
         }
       />
 
-      {!(serverSideApiKeyIsSet) ? (
+      {!(serverSideApiKeyIsSet) || 1 ? (
         <Key apiKey={apiKey} onApiKeyChange={onApiKeyChange} />
       ) : null}
 
-      {!(serverSidePluginKeysSet) ? (
+      {!(serverSidePluginKeysSet) || 1 ? (
         <PluginKeys
           pluginKeys={pluginKeys}
           onPluginKeyChange={onPluginKeyChange}

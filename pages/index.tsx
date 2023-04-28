@@ -13,7 +13,7 @@ import {
   OpenAIModels,
   fallbackModelID,
 } from '@/types/openai';
-import { Plugin, PluginKey } from '@/types/plugin';
+import { Plugin, PluginKey, PluginName } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 import { getEndpoint } from '@/utils/app/api';
 import {
@@ -120,18 +120,57 @@ const Home: React.FC<HomeProps> = ({
       const endpoint = getEndpoint(plugin);
       let body;
 
-      if (!plugin) {
-        body = JSON.stringify(chatBody);
-      } else {
-        body = JSON.stringify({
-          ...chatBody,
-          googleAPIKey: pluginKeys
-            .find((key) => key.pluginId === 'google-search')
-            ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value,
-          googleCSEId: pluginKeys
-            .find((key) => key.pluginId === 'google-search')
-            ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
-        });
+      /*
+            if (!plugin) {
+              body = JSON.stringify(chatBody);
+            } else {
+              body = JSON.stringify({
+                ...chatBody,
+                googleAPIKey: pluginKeys
+                  .find((key) => key.pluginId === 'google-search')
+                  ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value,
+                googleCSEId: pluginKeys
+                  .find((key) => key.pluginId === 'google-search')
+                  ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
+              });
+            }
+      */
+
+      switch (plugin?.name) {
+        case undefined:
+          body = JSON.stringify(chatBody);
+          break;
+        case PluginName.GOOGLE_SEARCH:
+          // Generate body for plugin1
+          body = JSON.stringify({
+            ...chatBody,
+            googleAPIKey: pluginKeys
+              .find((key) => key.pluginId === 'google-search')
+              ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value,
+            googleCSEId: pluginKeys
+              .find((key) => key.pluginId === 'google-search')
+              ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
+          });
+          break;
+        case PluginName.INCONTEXT_LEARNING:
+          // Generate body for plugin2
+          body = JSON.stringify({
+            ...chatBody,
+            pineconeApiKey: pluginKeys
+              .find((key) => key.pluginId === 'incontext-learning')
+              ?.requiredKeys.find((key) => key.key === 'PINECONE_API_KEY')?.value,
+            pineconeEnvironment: pluginKeys
+              .find((key) => key.pluginId === 'incontext-learning')
+              ?.requiredKeys.find((key) => key.key === 'PINECONE_ENVIRONMENT')?.value,
+            pineconeIndex: pluginKeys
+              .find((key) => key.pluginId === 'incontext-learning')
+              ?.requiredKeys.find((key) => key.key === 'PINECONE_INDEX_NAME')?.value,
+
+          });
+          break;
+        default:
+          body = JSON.stringify(chatBody);
+          //throw new Error('Invalid plugin name.');
       }
 
       const controller = new AbortController();
@@ -145,6 +184,7 @@ const Home: React.FC<HomeProps> = ({
       });
 
       if (!response.ok) {
+        console.log("error", response.statusText)
         setLoading(false);
         setMessageIsStreaming(false);
         toast.error(response.statusText);
@@ -248,7 +288,28 @@ const Home: React.FC<HomeProps> = ({
 
         setMessageIsStreaming(false);
       } else {
-        const { answer } = await response.json();
+        const json = await response.json();
+
+        let answer: string;
+
+        console.log("plugin", plugin.name)
+
+        switch (plugin.name) {
+          case undefined:
+            answer = "対応するプラグインが無いようです。";
+            break;
+          case PluginName.GOOGLE_SEARCH:
+            answer = json.answer;
+            break;
+          case PluginName.INCONTEXT_LEARNING:
+            answer = json.text;
+            break;
+          default:
+            //answer = json.test;
+            throw new Error('Invalid plugin name.');
+        }
+
+        //console.log("answer", answer, json.text)
 
         const updatedMessages: Message[] = [
           ...updatedConversation.messages,
@@ -317,7 +378,7 @@ const Home: React.FC<HomeProps> = ({
           code: data.error?.code,
           messageLines: [data.error?.message],
         });
-      } catch (e) {}
+      } catch (e) { }
       setModelError(error);
       return;
     }
@@ -412,6 +473,9 @@ const Home: React.FC<HomeProps> = ({
     saveConversation(conversation);
   };
 
+  const handleUploadPdf = () => {
+    exportData();
+  };
   // FOLDER OPERATIONS  --------------------------------------------
 
   const handleCreateFolder = (name: string, type: FolderType) => {
@@ -781,6 +845,7 @@ const Home: React.FC<HomeProps> = ({
                   onImportConversations={handleImportConversations}
                   onPluginKeyChange={handlePluginKeyChange}
                   onClearPluginKey={handleClearPluginKey}
+                  onUploadPdf={handleUploadPdf}
                 />
 
                 <button
@@ -873,8 +938,11 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 
   const googleApiKey = process.env.GOOGLE_API_KEY;
   const googleCSEId = process.env.GOOGLE_CSE_ID;
+  const pineconeApiKey = process.env.PINECONE_API_KEY;
+  const pineconeEnvironment = process.env.PINECONE_ENVIRONMENT;
+  const pineconeIndexName = process.env.PINECONE_INDEX_NAME;
 
-  if (googleApiKey && googleCSEId) {
+  if (googleApiKey && googleCSEId && pineconeApiKey && pineconeEnvironment && pineconeIndexName) {
     serverSidePluginKeysSet = true;
   }
 

@@ -9,5 +9,9 @@ export const getEndpoint = (plugin: Plugin | null) => {
     return 'api/google';
   }
 
+  if (plugin.id === PluginID.INCONTEXT_LEARNING) {
+    return 'api/incontext';
+  }
+
   return 'api/chat';
 };

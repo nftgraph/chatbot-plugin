@@ -38,6 +38,7 @@ interface Props {
   onImportConversations: (data: SupportedExportFormats) => void;
   onPluginKeyChange: (pluginKey: PluginKey) => void;
   onClearPluginKey: (pluginKey: PluginKey) => void;
+  onUploadPdf: () => void;
 }
 
 export const Chatbar: FC<Props> = ({

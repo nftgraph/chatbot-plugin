@@ -13,10 +13,12 @@ export interface PluginKey {
 
 export enum PluginID {
   GOOGLE_SEARCH = 'google-search',
+  INCONTEXT_LEARNING = 'incontext-learning', // 新しいプラグインID
 }
 
 export enum PluginName {
   GOOGLE_SEARCH = 'Google Search',
+  INCONTEXT_LEARNING = 'In-Context Learning', // 新しいプラグイン名
 }
 
 export const Plugins: Record<PluginID, Plugin> = {
@@ -30,6 +32,26 @@ export const Plugins: Record<PluginID, Plugin> = {
       },
       {
         key: 'GOOGLE_CSE_ID',
+        value: '',
+      },
+    ],
+  },
+
+  [PluginID.INCONTEXT_LEARNING]: {
+    // 新しいプラグイン
+    id: PluginID.INCONTEXT_LEARNING,
+    name: PluginName.INCONTEXT_LEARNING,
+    requiredKeys: [
+      {
+        key: 'PINECONE_API_KEY',
+        value: '',
+      },
+      {
+        key: 'PINECONE_ENVIRONMENT',
+        value: '',
+      },
+      {
+        key: 'PINECONE_INDEX_NAME',
         value: '',
       },
     ],

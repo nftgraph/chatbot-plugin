@@ -4,6 +4,7 @@ import { TextLoader } from 'langchain/document_loaders/fs/text';
 import { DocxLoader } from 'langchain/document_loaders/fs/docx';
 import { JSONLoader } from 'langchain/document_loaders/fs/json';
 import { CSVLoader } from 'langchain/document_loaders/fs/csv';
+import { detect, convert } from 'encoding-japanese';
 
 export default async function extractTextFromFile({
   fileData,
@@ -59,6 +60,7 @@ export default async function extractTextFromFile({
       const textDoc = await textLoader.load();
       result = textDoc;
       break;
+    
     default:
       throw new Error('Unsupported file type: ${filetype}');
   }

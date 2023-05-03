@@ -19,6 +19,7 @@
     "cheerio": "^1.0.0-rc.12",
     "class-variance-authority": "^0.5.3",
     "clsx": "^1.2.1",
+    "encoding-japanese": "^2.0.0",
     "eventsource-parser": "^0.1.0",
     "formidable": "^2.1.1",
     "i18next": "^22.4.13",

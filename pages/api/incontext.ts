@@ -11,8 +11,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { messages, key, model, pineconeApiKey, pineconeEnvironment, pineconeIndex } = req.body as IncontextBody;
+  const { messages, key, model, defaultModelId, pineconeApiKey, pineconeEnvironment, pineconeIndex } = req.body as IncontextBody;
 
+  console.log('model:', model)
   /*
   console.log(
     "pineconeApiKey:", pineconeApiKey,
@@ -56,7 +57,7 @@ export default async function handler(
     );
 
     //create chain
-    const chain = makeChain(vectorStore, key ? key : process.env.OPENAI_API_KEY);
+    const chain = makeChain(vectorStore, key ? key : process.env.OPENAI_API_KEY, model.id);
     //Ask a question
     const response = await chain.call({
       question: sanitizedQuestion,

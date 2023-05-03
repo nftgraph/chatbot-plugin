@@ -1,6 +1,7 @@
 import { OpenAI } from 'langchain/llms/openai';
 import { PineconeStore } from 'langchain/vectorstores/pinecone';
 import { ConversationalRetrievalQAChain } from 'langchain/chains';
+import { OpenAIModels, OpenAIModelID } from '@/types/openai';
 
 /*
 const CONDENSE_PROMPT = `Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
@@ -38,17 +39,19 @@ const QA_PROMPT = `あなたは、役立つアドバイスを提供するAIア�
 Question: {question}
 Helpful answer in markdown:`;
 
-export const makeChain = (vectorstore: PineconeStore, openaiApiKey: string) => {
+export const makeChain = (vectorstore: PineconeStore, openaiApiKey: string, modelName: string) => {
+  //console.log('OpenAIModels', OpenAIModels[defaultModelId].id)
+
   const model = new OpenAI({
     temperature: 0, // increase temepreature to get more creative answers
-    modelName: 'gpt-3.5-turbo',
+    modelName: modelName,
     //modelName: 'gpt-4',
     openAIApiKey: openaiApiKey, //change this to gpt-4 if you have access to the api
   });
 
   const chain = ConversationalRetrievalQAChain.fromLLM(
     model,
-    vectorstore.asRetriever(5),
+    vectorstore.asRetriever(2),
     {
       qaTemplate: QA_PROMPT,
       questionGeneratorTemplate: CONDENSE_PROMPT,

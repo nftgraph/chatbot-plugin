@@ -165,7 +165,7 @@ const Home: React.FC<HomeProps> = ({
             pineconeIndex: pluginKeys
               .find((key) => key.pluginId === 'incontext-learning')
               ?.requiredKeys.find((key) => key.key === 'PINECONE_INDEX_NAME')?.value,
-
+            defaultModelId: defaultModelId,
           });
           break;
         default:

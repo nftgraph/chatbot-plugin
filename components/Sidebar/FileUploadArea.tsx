@@ -110,7 +110,7 @@ export function FileUploadArea({
 
   return (
     <div className="flex flex-col items-start gap-2 min-w-[400px]">
-      <h2 className="mt-10 scroll-m-20 pb-2 text-lg font-semibold tracking-tight transition-colors first:mt-0">
+      <h2 className="mt-0 scroll-m-10 pb-2 text-lg font-semibold tracking-tight transition-colors">
         Upload one or more files
       </h2>
       <div
@@ -118,7 +118,7 @@ export function FileUploadArea({
         {...getRootProps()}
       >
         {/* <h4>{fileRejectionItems}</h4> */}
-        <div className="flex min-h-[150px] cursor-pointer items-center justify-center p-10 hover:bg-gray-100">
+        <div className="flex min-h-[150px] cursor-pointer items-center justify-center p-10 hover:bg-gray-600">
           <input {...getInputProps()} />
           {files ? (
             <ul>
